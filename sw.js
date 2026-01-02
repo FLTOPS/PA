@@ -1,11 +1,10 @@
-// sw.js
-const CACHE_NAME = "pa-cache-v2";
+const CACHE_NAME = "pa-cache-v3";
 const urlsToCache = [
-  "/",          // index.html
+  "./",
   "./index.html",
   "./styles.css",
   "./script.js",
-  "./icon.png"   // 앱 아이콘
+  "./icon.png"
 ];
 
 // 설치 단계: 캐시 저장
@@ -34,22 +33,18 @@ self.addEventListener("activate", event => {
   );
 });
 
-// 요청 가로채기: 캐시 우선 전략
+// 요청 가로채기: 캐시 우선 + 네트워크 응답 캐싱
 self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request).then(response => {
-      // 캐시에 있으면 반환, 없으면 네트워크 요청
-      return response || fetch(event.request).then(networkResponse => {
-        // 네트워크 응답을 캐시에 저장
+      if (response) {
+        return response;
+      }
+      return fetch(event.request).then(networkResponse => {
         return caches.open(CACHE_NAME).then(cache => {
           cache.put(event.request, networkResponse.clone());
           return networkResponse;
         });
-      }).catch(() => {
-        // 완전히 오프라인일 때 대체 페이지 제공 가능
-        if (event.request.destination === "document") {
-          return caches.match("/offline.html");
-        }
       });
     })
   );
