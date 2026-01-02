@@ -6,9 +6,9 @@
     <title>Air Premia - CAPTAIN ANNOUNCEMENT Rev4</title>
 
   <!-- 매니페스트 연결 -->
-  <link rel="manifest" href="/manifest.json">
+  <link rel="manifest" href="./manifest.json">
   <!-- 아이콘 -->
-  <link rel="icon" href="/icon.png">
+  <link rel="icon" href="./icon.png">
   <meta name="theme-color" content="#182749">
 
     <!-- Tailwind CSS -->
@@ -645,7 +645,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js")
+        navigator.serviceWorker.register("./sw.js")
           .then(reg => console.log("Service Worker registered:", reg))
           .catch(err => console.error("Service Worker registration failed:", err));
       });
