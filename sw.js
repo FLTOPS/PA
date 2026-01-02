@@ -1,4 +1,4 @@
-const CACHE_NAME = 'offline-cache-v1';
+const CACHE_NAME = 'offline-cache-v2';
 const FILES_TO_CACHE = [
   '/sites/FPL/Shared%20Documents/FDF/Flight%20Document%20Folder.html'
 ];
