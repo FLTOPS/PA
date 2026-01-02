@@ -1,16 +1,27 @@
-const CACHE_NAME = 'offline-cache-v2';
-const FILES_TO_CACHE = [
-  '/sites/FPL/Shared%20Documents/FDF/Flight%20Document%20Folder.html'
+// sw.js
+const CACHE_NAME = "pa-cache-v1";
+const urlsToCache = [
+  "/",          // index.html
+  "/index.html",
+  "/styles.css",
+  "/script.js",
+  "/icon.png"   // 앱 아이콘
 ];
 
-self.addEventListener('install', event => {
+// 설치 단계: 캐시 저장
+self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE))
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(urlsToCache);
+    })
   );
 });
 
-self.addEventListener('fetch', event => {
+// 요청 가로채기: 캐시 우선
+self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request))
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
   );
 });
