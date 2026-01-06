@@ -2,642 +2,383 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Air Premia - CAPTAIN ANNOUNCEMENT Rev4</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Air Premia - PA Script (DST 지원)</title>
 
   <!-- 매니페스트 연결 (프로젝트 페이지라면 ./manifest.json 권장) -->
-  <link rel="manifest" href="./manifest.json">
-  <link rel="icon" href="./icon.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.png">
   <meta name="theme-color" content="#182749">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
-        
+        :root {
+            --ap-navy: #00264d;
+            --ap-gold: #c5a059;
+            --bg: #f2f4f7;
+            --white: #ffffff;
+            --text-dark: #1a1a1a;
+            --highlight-color: #e67e22;
+        }
+
+        body.dark-mode {
+            --bg: #121212;
+            --white: #1e1e1e;
+            --text-dark: #e0e0e0;
+            --highlight-color: #ff9f43;
+        }
+
         body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #f4f7f9;
-        }
-        .ap-navy { background-color: #001f3f; }
-        .ap-gold { color: #c5a059; }
-        
-        .script-box {
-            border-left: 4px solid #001f3f;
-            background-color: #f8fafc;
-            word-break: keep-all;
-            overflow-wrap: break-word;
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            transition: background 0.3s;
         }
 
-        .unified-script-text {
-            font-size: 1.35rem; 
-            line-height: 2.0;
-        }
-
-        .variable-highlight {
-            color: #001f3f; 
-            font-weight: 700;
-            border-bottom: 2.5px solid #c5a059; 
-            padding: 0 4px;
-            display: inline-block;
-            min-width: 60px;
-            text-align: center;
-            vertical-align: baseline; 
-            line-height: 1;
-            background-color: rgba(197, 160, 89, 0.08); 
-            border-radius: 2px 2px 0 0;
-            margin: 0 2px;
-        }
-
-        .tab-active {
-            border-bottom: 4px solid #c5a059;
-            color: white;
-            font-weight: 700;
-        }
-        .tab-inactive {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .stepper-btn {
-            background-color: #e2e8f0;
-            color: #475569;
-            width: 24px;
-            height: 24px;
+        .tab-header-container {
             display: flex;
             align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: bold;
+            background: var(--ap-navy);
+            padding: 0 15px;
+            height: 60px;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .tab-group { display: flex; height: 100%; gap: 5px; }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #95a5a6;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            padding: 0 40px; 
+            height: 100%;
+            border-bottom: 4px solid transparent;
             transition: all 0.2s;
         }
-        .stepper-btn:hover { background-color: #cbd5e1; }
-        .stepper-btn:active { background-color: #94a3b8; }
 
-        @media print {
-            .no-print { display: none; }
+        .tab-btn.active { color: white; border-bottom: 4px solid var(--ap-gold); }
+
+        .tab-inner-controls {
+            background: var(--white);
+            padding: 15px 40px;
+            border-bottom: 1px solid #ddd;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--text-dark);
         }
+        .tab-inner-controls.active { display: flex; }
+        
+        .tab-inner-controls select {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: var(--white);
+            color: var(--text-dark);
+        }
+
+        .chk-group { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .chk-group input { width: 16px; height: 16px; cursor: pointer; }
+
+        .name-inputs { display: flex; align-items: center; gap: 8px; flex: 1; justify-content: flex-end; padding-right: 15px; }
+        .name-inputs input {
+            width: 80px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.15);
+            color: white;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .utility-group { display: flex; gap: 12px; align-items: center; }
+        .btn-tool {
+            padding: 4px 10px;
+            border: 1px solid var(--ap-gold);
+            border-radius: 4px;
+            background: transparent;
+            color: var(--ap-gold);
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .content-area { flex: 1; display: none; grid-template-columns: 1fr 1fr; background: #7f8c8d; gap: 1px; overflow: hidden; }
+        .content-area.active { display: grid; }
+
+        .pane { padding: 40px; background: var(--white); overflow-y: auto; }
+        
+        .script { font-size: 1.8rem; line-height: 1.6; word-break: keep-all; }
+        .script br { content: ""; display: block; margin-top: 15px; } 
+        
+        .script-en { font-size: 1.6rem; font-style: italic; opacity: 0.9; line-height: 1.6; }
+        .script-en br { margin-top: 12px; }
+
+        .highlight { color: var(--highlight-color); font-weight: 800; border-bottom: 2px solid var(--highlight-color); }
+        .hidden { display: none !important; }
+
+        /* DST 텍스트 색상 조절 */
+        .dst-label { color: var(--ap-gold); font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; gap: 4px; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body>
 
-    <div class="max-w-6xl mx-auto">
-        <!-- Header -->
-        <header class="ap-navy text-white rounded-t-xl shadow-lg overflow-hidden relative">
-            <div class="p-6 flex justify-between items-start md:items-center border-b border-white/10">
-                <div>
-                    <h1 class="text-2xl font-black tracking-tighter text-white uppercase">AIR PREMIA</h1>
-                    <p class="text-sm opacity-80 uppercase tracking-widest text-white/80">CAPTAIN ANNOUNCEMENT Rev4</p>
-                </div>
-                
-                <!-- Reset Button -->
-                <button onclick="resetAllData()" class="no-print bg-white/10 hover:bg-red-600/80 text-white text-[10px] md:text-xs font-bold px-3 py-1.5 rounded-lg transition border border-white/20 flex items-center gap-1.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    RESET
-                </button>
-            </div>
-            
-            <!-- Navigation Tabs -->
-            <nav class="flex no-print">
-                <button onclick="switchTab('welcome')" id="tab-welcome" class="flex-1 py-4 text-center transition tab-active hover:bg-white/5 font-bold uppercase tracking-tight">Welcome PA (출발)</button>
-                <button onclick="switchTab('arrival')" id="tab-arrival" class="flex-1 py-4 text-center transition tab-inactive hover:bg-white/5 font-bold uppercase tracking-tight">Arrival PA (도착)</button>
-            </nav>
-        </header>
+    <div class="tab-header-container">
+        <div class="tab-group">
+            <button class="tab-btn active" id="btn-welcome" onclick="setTab('welcome')">WELCOME</button>
+            <button class="tab-btn" id="btn-arrival" onclick="setTab('arrival')">ARRIVAL</button>
+        </div>
 
-        <!-- Main Content Area -->
-        <main class="bg-white shadow-xl rounded-b-xl overflow-hidden min-h-[600px]">
-            
-            <!-- SECTION 1: WELCOME PA -->
-            <div id="section-welcome" class="p-6 md:p-8">
-                <!-- Inputs -->
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 p-4 bg-slate-50 rounded-xl border border-slate-200 no-print">
-                    <div class="md:col-span-1">
-                        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-tighter">Greeting</label>
-                        <select id="w-greeting" class="w-full border rounded p-2 font-bold focus:ring-2 focus:ring-blue-900 outline-none" onchange="inputChanged()">
-                            <option value="Morning" selected>Morning</option>
-                            <option value="Afternoon">Afternoon</option>
-                            <option value="Evening">Evening</option>
-                        </select>
-                    </div>
-                    <div class="md:col-span-1">
-                        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-tighter">Captain</label>
-                        <input type="text" id="w-captain" placeholder="성함" class="w-full border rounded p-2 font-bold focus:ring-2 focus:ring-blue-900 outline-none" oninput="inputChanged()">
-                    </div>
-                    <div class="md:col-span-1">
-                        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-tighter">Dest</label>
-                        <select id="w-dest-select" class="w-full border rounded p-2 font-bold focus:ring-2 focus:ring-blue-900 outline-none" onchange="toggleWelcomeDest(); inputChanged()">
-                            <option value="">선택해 주세요</option>
-                            <option value="서울, 인천 공항">서울, 인천 공항 (ICN)</option>
-                            <option value="로스앤젤레스">로스앤젤레스 (LAX)</option>
-                            <option value="뉴욕">뉴욕 (EWR/JFK)</option>
-                            <option value="샌프란시스코">샌프란시스코 (SFO)</option>
-                            <option value="워싱턴">워싱턴 (IAD)</option>
-                            <option value="도쿄/나리타">도쿄/나리타 (NRT)</option>
-                            <option value="방콕">방콕 (BKK)</option>
-                            <option value="호치민">호치민 (SGN)</option>
-                            <option value="다낭">다낭 (DAD)</option>
-                            <option value="홍콩">홍콩 (HKG)</option>
-                            <option value="프랑크푸르트">프랑크푸르트 (FRA)</option>
-                            <option value="custom">직접 입력</option>
-                        </select>
-                        <input type="text" id="w-dest-custom" placeholder="도시명" class="w-full border rounded p-2 mt-1 hidden" oninput="inputChanged()">
-                    </div>
-                    <div class="md:col-span-1">
-                        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-tighter">Flight Hours</label>
-                        <input type="number" id="w-hour" placeholder="00" class="w-full border rounded p-2 font-bold focus:ring-2 focus:ring-blue-900 outline-none" oninput="inputChanged()">
-                    </div>
-                    <div class="md:col-span-1">
-                        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-tighter">Mins</label>
-                        <input type="number" id="w-min" placeholder="00" class="w-full border rounded p-2 font-bold focus:ring-2 focus:ring-blue-900 outline-none" oninput="inputChanged()">
-                    </div>
-                </div>
+        <div class="name-inputs">
+            <input type="text" id="nameKorInput" placeholder="이름(한글)" oninput="updateAll()">
+            <input type="text" id="nameEngInput" placeholder="성(영문)" oninput="updateAll()">
+        </div>
 
-                <div class="mb-4 font-bold bg-red-50 text-red-600 py-2 px-4 rounded-lg border border-red-100 inline-block text-xs no-print">
-                    ⚠ All Cabin doors Closed & Auto 확인 후 실시
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Korean Welcome -->
-                    <div class="flex flex-col">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-blue-900 border-b-2 border-blue-900">KOREAN <span class="text-sm font-normal">&lt;한글&gt;</span></h3>
-                            <button onclick="copyText('welcome-ko')" class="text-xs bg-slate-100 px-3 py-1 rounded hover:bg-slate-200 no-print font-bold">방송문 복사</button>
-                        </div>
-                        <div id="welcome-ko" class="script-box p-8 rounded-lg unified-script-text text-gray-800 flex-grow font-medium">
-                            승객 여러분, 안녕하십니까. 저는 기장 <span id="dv-w-ko-captain" class="variable-highlight"></span> 입니다.<br>
-                            에어프레미아를 이용해 주셔서 감사합니다.<br>
-                            오늘 <span id="dv-w-ko-dest" class="variable-highlight"></span> 까지의 예상 비행 시간은 <span id="dv-w-ko-hour" class="variable-highlight"></span>시간 <span id="dv-w-ko-min" class="variable-highlight"></span>분입니다.<br>
-                            저와 전 승무원들이 최선을 다해 안전하게 모시겠습니다. 고맙습니다.
-                        </div>
-                    </div>
-                    <!-- English Welcome -->
-                    <div class="flex flex-col">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-blue-900 border-b-2 border-blue-900">ENGLISH <span class="text-sm font-normal">&lt;영문&gt;</span></h3>
-                            <button onclick="copyText('welcome-en')" class="text-xs bg-slate-100 px-3 py-1 rounded hover:bg-slate-200 no-print font-bold">Copy Script</button>
-                        </div>
-                        <div id="welcome-en" class="script-box p-8 rounded-lg unified-script-text text-gray-800 flex-grow font-medium italic">
-                            Good <span id="dv-w-en-greeting" class="variable-highlight">Morning</span> Ladies and Gentlemen.<br>
-                            This is Captain <span id="dv-w-en-captain" class="variable-highlight"></span> speaking. Welcome aboard Air Premia.<br>
-                            The flight to <span id="dv-w-en-dest" class="variable-highlight"></span> will take <span id="dv-w-en-hour" class="variable-highlight"></span> hours and <span id="dv-w-en-min" class="variable-highlight"></span> minutes.<br>
-                            Thank you for flying with us, and enjoy your flight.
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION 2: ARRIVAL PA -->
-            <div id="section-arrival" class="p-6 md:p-8 hidden">
-                <!-- Inputs -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 p-4 bg-slate-50 rounded-xl border border-slate-200 no-print">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700">목적지 공항</label>
-                        <select id="a-airport-select" class="w-full border rounded p-2 font-bold mt-1 focus:ring-2 focus:ring-blue-900 outline-none" onchange="toggleArrivalAirport(); inputChanged()">
-                            <option value="">선택해 주세요</option>
-                            <option value="서울, 인천 공항">서울, 인천 공항 (ICN)</option>
-                            <option value="로스앤젤레스">로스앤젤레스 (LAX)</option>
-                            <option value="뉴욕">뉴욕 (EWR/JFK)</option>
-                            <option value="샌프란시스코">샌프란시스코 (SFO)</option>
-                            <option value="워싱턴">워싱턴 (IAD)</option>
-                            <option value="도쿄/나리타">도쿄/나리타 (NRT)</option>
-                            <option value="방콕">방콕 (BKK)</option>
-                            <option value="호치민">호치민 (SGN)</option>
-                            <option value="다낭">다낭 (DAD)</option>
-                            <option value="프랑크푸르트">프랑크푸르트 (FRA)</option>
-                            <option value="custom">직접 입력</option>
-                        </select>
-                        <input type="text" id="a-airport-custom" placeholder="공항명" class="w-full border rounded p-2 mt-1 hidden font-bold" oninput="inputChanged()">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700">도착 현지 날짜</label>
-                        <div class="flex gap-2 mt-1 items-center">
-                            <div class="flex flex-col items-center">
-                                <span class="text-[10px] text-gray-400 font-bold uppercase">Month</span>
-                                <div class="flex items-center gap-1 border bg-white rounded p-1">
-                                    <button class="stepper-btn" onclick="stepValue('a-month', -1)">-</button>
-                                    <input type="text" id="a-month" class="w-8 text-center font-bold outline-none" oninput="inputChanged()">
-                                    <button class="stepper-btn" onclick="stepValue('a-month', 1)">+</button>
-                                </div>
-                            </div>
-                            <div class="flex flex-col items-center">
-                                <span class="text-[10px] text-gray-400 font-bold uppercase">Date</span>
-                                <div class="flex items-center gap-1 border bg-white rounded p-1">
-                                    <button class="stepper-btn" onclick="stepValue('a-date', -1)">-</button>
-                                    <input type="text" id="a-date" class="w-8 text-center font-bold outline-none" oninput="inputChanged()">
-                                    <button class="stepper-btn" onclick="stepValue('a-date', 1)">+</button>
-                                </div>
-                            </div>
-                            <div class="flex flex-col items-center">
-                                <span class="text-[10px] text-gray-400 font-bold uppercase">Day</span>
-                                <input type="text" id="a-day" class="w-10 h-[34px] text-center font-black border rounded bg-gray-100 outline-none mt-auto" readonly>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700">도착 현지 시간</label>
-                        <div class="flex gap-2 mt-1 items-center">
-                            <div class="flex flex-col items-center">
-                                <span class="text-[10px] text-gray-400 font-bold uppercase">AM/PM</span>
-                                <select id="a-ampm" class="h-[34px] border rounded p-1 font-bold outline-none bg-white" onchange="inputChanged()">
-                                    <option value="오전">오전</option>
-                                    <option value="오후">오후</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-col items-center">
-                                <span class="text-[10px] text-gray-400 font-bold uppercase">Hour</span>
-                                <div class="flex items-center gap-1 border bg-white rounded p-1">
-                                    <button class="stepper-btn" onclick="stepValue('a-hour', -1)">-</button>
-                                    <input type="text" id="a-hour" class="w-8 text-center font-bold outline-none" oninput="inputChanged()">
-                                    <button class="stepper-btn" onclick="stepValue('a-hour', 1)">+</button>
-                                </div>
-                            </div>
-                            <div class="flex flex-col items-center">
-                                <span class="text-[10px] text-gray-400 font-bold uppercase">Min</span>
-                                <div class="flex items-center gap-1 border bg-white rounded p-1">
-                                    <button class="stepper-btn" onclick="stepValue('a-min', -1)">-</button>
-                                    <input type="text" id="a-min" class="w-8 text-center font-bold outline-none" oninput="inputChanged()">
-                                    <button class="stepper-btn" onclick="stepValue('a-min', 1)">+</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700">날씨 상태</label>
-                        <select id="a-weather" class="w-full border rounded p-2 mt-1 font-bold focus:ring-2 focus:ring-blue-900 outline-none" onchange="inputChanged()">
-                            <option value="맑으며">맑으며</option>
-                            <option value="흐리며">흐리며</option>
-                            <option value="비가 오고 있으며">비가 오고 있으며</option>
-                            <option value="눈이 오고 있으며">눈이 오고 있으며</option>
-                            <option value="안개가 끼어 있으며">안개가 끼어 있으며</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700">기온 (℃)</label>
-                        <input type="number" id="a-temp" placeholder="섭씨" class="w-full border rounded p-2 mt-1 font-bold focus:ring-2 focus:ring-blue-900 outline-none" oninput="inputChanged()">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700">옵션: 관광지/여행사</label>
-                        <input type="text" id="a-charter" placeholder="도시명" class="w-full border rounded p-2 mt-1 font-bold focus:ring-2 focus:ring-blue-900 outline-none" oninput="inputChanged()">
-                    </div>
-                    <div class="md:col-span-3 flex flex-wrap gap-4 mt-2 no-print">
-                        <label class="flex items-center gap-2 text-sm cursor-pointer font-medium"><input type="checkbox" id="c-bumpy" onchange="inputChanged()"> 기류 불안정(Bumpy) 포함</label>
-                        <label class="flex items-center gap-2 text-sm cursor-pointer font-medium"><input type="checkbox" id="c-timezone" onchange="inputChanged()"> 시차 변동 안내 포함</label>
-                        <label class="flex items-center gap-2 text-sm cursor-pointer font-medium"><input type="checkbox" id="c-option" onchange="inputChanged()"> 전세기/관광지 멘트 포함</label>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Korean Arrival -->
-                    <div class="flex flex-col">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-blue-900 border-b-2 border-blue-900">KOREAN <span class="text-sm font-normal">&lt;한글&gt;</span></h3>
-                            <button onclick="copyText('arrival-ko')" class="text-xs bg-slate-100 px-3 py-1 rounded hover:bg-slate-200 no-print font-bold">복사</button>
-                        </div>
-                        <div id="arrival-ko" class="script-box p-8 rounded-lg unified-script-text text-gray-800 flex-grow font-medium">
-                            <div class="space-y-4">
-                                <p>손님 여러분, 저는 기장입니다.</p>
-                                <p id="ko-enjoy">편안한 비행 되셨습니까?</p>
-                                <p id="ko-bumpy-txt" class="hidden font-bold text-red-800">오늘 기류 영향으로 비행기가 많이 흔들렸습니다. 이점 널리 양해 바랍니다.</p>
-                                <p>우리는 앞으로 약 40분 후에 목적지 <span class="dv-a-airport variable-highlight"></span> 공항에 착륙할 예정입니다.</p>
-                                <p id="ko-timezone-box" class="hidden">
-                                    지금 이곳은 <span class="dv-a-month variable-highlight"></span>월 <span class="dv-a-date variable-highlight"></span>일 <span class="dv-a-day variable-highlight"></span>요일 
-                                    <span class="dv-a-ampm variable-highlight"></span> <span class="dv-a-hour variable-highlight"></span>시 <span class="dv-a-min variable-highlight"></span>분 입니다.
-                                </p>
-                                <p>
-                                    <span class="dv-a-airport variable-highlight"></span> 공항의 날씨는 <span class="dv-a-weather variable-highlight"></span>, <br>
-                                    기온은 <span class="dv-a-temp variable-highlight"></span>도 입니다.
-                                </p>
-                                <p>소중한 여행을 저희 에어프레미아와 함께 해 주셔서 감사드립니다. 아무쪼록 가시는 목적지까지 안전하고 즐거운 여행이 되시기 바랍니다. 고맙습니다.</p>
-                                <div id="ko-option-box" class="mt-4 pt-4 border-t border-dashed border-gray-300 hidden font-normal">
-                                    <p class="text-sm font-bold text-gray-500 mb-1">※ 옵션 : 관광지 또는 여행사 전세기</p>
-                                    <p>오늘 저희 에어프레미아와 함께 해 주셔서 다시 한번 감사드립니다. 아무쪼록 <span class="dv-a-charter variable-highlight"></span>에서 즐겁고, 소중한 여행하시기 바랍니다. 고맙습니다.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- English Arrival -->
-                    <div class="flex flex-col">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-blue-900 border-b-2 border-blue-900">ENGLISH <span class="text-sm font-normal">&lt;영문&gt;</span></h3>
-                            <button onclick="copyText('arrival-en')" class="text-xs bg-slate-100 px-3 py-1 rounded hover:bg-slate-200 no-print font-bold">Copy</button>
-                        </div>
-                        <div id="arrival-en" class="script-box p-8 rounded-lg unified-script-text text-gray-800 flex-grow font-medium italic">
-                            <div class="space-y-4">
-                                <p>Ladies and gentlemen, this is your captain speaking.</p>
-                                <p id="en-enjoy">We hope you have enjoyed the flight.</p>
-                                <p id="en-bumpy-txt" class="hidden font-bold text-red-800">The ride was quite bumpy today, we ask for your understanding.</p>
-                                <p>We are about 40 minutes away from <span class="dv-a-en-airport variable-highlight"></span> airport.</p>
-                                <p id="en-timezone-box" class="hidden font-sans italic">
-                                    Local time now is <span class="dv-a-hour variable-highlight"></span> : <span class="dv-a-min variable-highlight"></span> 
-                                    <span class="dv-a-en-ampm variable-highlight"></span>, on <span class="dv-a-en-day variable-highlight"></span>, 
-                                    <span class="dv-a-en-month variable-highlight"></span>, <span class="dv-a-date variable-highlight"></span>.
-                                </p>
-                                <p>
-                                    At the airport it’s <span class="dv-a-en-weather variable-highlight"></span>. <br>
-                                    And the temperature is <span class="dv-a-temp variable-highlight"></span> degrees Celsius or <span class="dv-a-temp-f variable-highlight"></span> degrees Fahrenheit.
-                                </p>
-                                <p>Once again, thank you for flying Air Premia and we hope to see you again on your next trip.</p>
-                                <div id="en-option-box" class="mt-4 pt-4 border-t border-dashed border-gray-300 hidden font-sans italic">
-                                    <p class="text-sm font-bold text-gray-500 mb-1 font-sans not-italic">※ Option: Sightseeing / Charter</p>
-                                    <p>Once again, thank you for flying Air Premia and we hope you have great time in <span class="dv-a-charter variable-highlight"></span>.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-        
-        <footer class="mt-8 text-center text-gray-400 text-sm no-print font-medium">
-            <p>&copy; 2024 Air Premia Line Operations. Internal Use Only.</p>
-        </footer>
+        <div class="utility-group">
+            <label class="dst-label">
+                <input type="checkbox" id="dstCheck" onchange="updateAll()"> DST
+            </label>
+            <button class="btn-tool" onclick="toggleDarkMode()">NIGHT</button>
+            <button class="btn-tool" onclick="resetSettings()">RESET</button>
+        </div>
     </div>
 
-    <!-- Toast -->
-    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full opacity-0 pointer-events-none transition-opacity duration-300 shadow-2xl z-50">
-        방송문이 클립보드에 복사되었습니다.
+    <div id="set-welcome-inner" class="tab-inner-controls active">
+        <span>Departure:</span> <select id="depSelect"></select>
+        <span>Destination:</span> <select id="destSelect"></select>
+        <span>비행시간:</span> <select id="hSel"></select>시 <select id="mSel"></select>분
+    </div>
+
+    <div id="set-arrival-inner" class="tab-inner-controls">
+        <span>날씨:</span>
+        <select id="weatherSelect">
+            <option value="맑으며">맑으며</option>
+            <option value="흐리며">흐리며</option>
+            <option value="비가 오고 있으며">비가 오고 있으며</option>
+            <option value="눈이 오고 있으며">눈이 오고 있으며</option>
+            <option value="안개가 끼어 있으며">안개가 끼어 있으며</option>
+        </select>
+        <span>기온:</span> <select id="tempSelect"></select>℃
+        <label class="chk-group">
+            <input type="checkbox" id="shakeCheck" onchange="updateAll()"> 흔들림
+        </label>
+    </div>
+
+    <div id="welcome" class="content-area active">
+        <div class="pane">
+            <div class="script">
+                승객 여러분, 안녕하십니까? <br>
+                저는 기장 <span id="korNameSpan"></span>입니다. <br>
+                에어프레미아를 이용해 주셔서 감사합니다. <br>
+                오늘 <span class="highlight dest-text">목적지</span>공항까지의 예상 비행 시간은 <span class="highlight" id="korTimeDuration">시간 미설정</span>입니다. <br>
+                저와 전 승무원들이 최선을 다해 안전하게 모시겠습니다. <br>
+                고맙습니다.
+            </div>
+        </div>
+        <div class="pane">
+            <div class="script script-en">
+                <span id="engGreetingWelcome">Good Morning</span>, Ladies and Gentlemen. <br>
+                This is Captain <span id="engNameSpan"></span> speaking. <br>
+                Welcome aboard Air Premia. <br>
+                The flight to <span class="highlight dest-text">Destination</span> Airport will take <span class="highlight" id="engTimeDuration">__ hours</span>. <br>
+                Thank you for flying with us, and enjoy the flight.
+            </div>
+        </div>
+    </div>
+
+    <div id="arrival" class="content-area">
+        <div class="pane">
+            <div class="script">
+                손님 여러분, 저는 기장입니다. <br>
+                <span id="korGreeting">편안한 비행되셨습니까?</span> <br>
+                우리는 앞으로 약 40분 후에 목적지 <span class="highlight dest-text">목적지</span>공항에 착륙할 예정입니다.<span id="korTimeSpan"><br>지금 이곳은 <span class="highlight" id="currentTimeKor">오후 12시 00분</span>입니다.</span> <br>
+                <span class="highlight dest-text">목적지</span>공항의 날씨는 <span class="highlight weather-text">맑으며</span>, 기온은 섭씨 <span class="highlight temp-text">20</span>도 입니다. <br>
+                소중한 여행을 저희 에어프레미아와 함께 해 주셔서 감사드립니다. <br>
+                가시는 목적지까지 안전하고 즐거운 여행이 되시기 바랍니다. <br>
+                고맙습니다.
+            </div>
+        </div>
+        <div class="pane">
+            <div class="script script-en">
+                Ladies and Gentlemen, This is captain speaking. <br>
+                <span id="engGreetingArrival">We hope you have enjoyed the flight.</span> <br>
+                We are about 40 minutes away from <span class="highlight dest-text">Destination</span> airport. <span id="engTimeSpan"><br>Local Time is <span class="highlight" id="currentTimeEn">12:00 PM</span>.</span> <br>
+                The temperature is <span class="highlight temp-text">20</span><span class="highlight">℃</span>, or <span class="highlight" id="tempF">68</span><span class="highlight">℉</span>. <br>
+                and, it's <span class="highlight weather-en-text">clear</span>. <br>
+                Once again, Thank you for being with Air Premia, <br>
+                and we hope to see you again on your next trip.
+            </div>
+        </div>
     </div>
 
     <script>
-        // Data Maps
-        const SURNAME_MAP = {
-            '김': 'KIM', '이': 'LEE', '박': 'PARK', '최': 'CHOI', '정': 'JUNG',
-            '강': 'KANG', '조': 'CHO', '윤': 'YOON', '장': 'JANG', '신': 'SHIN',
-            '유': 'YOO', '한': 'HAN', '오': 'OH', '서': 'SEO', '전': 'JEON',
-            '권': 'KWON', '황': 'HWANG', '안': 'AHN', '송': 'SONG', '류': 'RYU',
-            '홍': 'HONG', '고': 'KO', '문': 'MOON', '양': 'YANG', '손': 'SON',
-            '배': 'BAE', '백': 'BAEK', '허': 'HUH', '남': 'NAM', '심': 'SHIM',
-            '노': 'NOH', '하': 'HA', '곽': 'KWAK', '성': 'SUNG', '차': 'CHA',
-            '주': 'JOO', '우': 'WOO', '구': 'KOO', '임': 'LIM', '나': 'NA',
-            '민': 'MIN', '진': 'JIN', '지': 'JI', '엄': 'EUM', '채': 'CHAE',
-            '원': 'WON', '천': 'CHEON', '방': 'BANG', '공': 'KONG', '현': 'HYUN',
-            '함': 'HAM', '설': 'SEOL', '염': 'YEOM', '여': 'YEO', '추': 'CHOO',
-            '변': 'BYUN', '도': 'DO', '석': 'SUK', '단': 'DAN', '마': 'MA',
-            '가': 'KA', '피': 'PYEE', '라': 'RA'
+        const elements = {
+            dep: document.getElementById('depSelect'),
+            dest: document.getElementById('destSelect'),
+            h: document.getElementById('hSel'),
+            m: document.getElementById('mSel'),
+            weather: document.getElementById('weatherSelect'),
+            temp: document.getElementById('tempSelect'),
+            shake: document.getElementById('shakeCheck'),
+            dst: document.getElementById('dstCheck'), // DST 추가
+            nameKor: document.getElementById('nameKorInput'),
+            nameEng: document.getElementById('nameEngInput')
         };
-        const DOUBLE_SURNAMES = { '남궁': 'NAMKOONG', '황보': 'HWANGBO', '제갈': 'JEGAL', '사공': 'SAGONG', '선우': 'SUNWOO', '독고': 'DOKGO' };
-        const AIRPORT_MAP = {
-            '서울, 인천 공항': 'Seoul Incheon', '로스앤젤레스': 'Los Angeles', '뉴욕': 'New York', '샌프란시스코': 'San Francisco',
-            '워싱턴': 'Washington D.C. Dulles', '도쿄/나리타': 'Narita', '방콕': 'Bangkok', '호치민': 'Ho Chi Minh City',
-            '다낭': 'Da Nang', '홍콩': 'Hong Kong', '프랑크푸르트': 'Frankfurt'
-        };
-        const MONTHS = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        const DAYS_KR = ['일', '월', '화', '수', '목', '금', '토'];
-        const DAYS_EN = { '일': 'Sunday', '월': 'Monday', '화': 'Tuesday', '수': 'Wednesday', '목': 'Thursday', '금': 'Friday', '토': 'Saturday' };
-        const WEATHER = { '맑으며': 'clear', '흐리며': 'cloudy', '비가 오고 있으며': 'raining', '눈이 오고 있으며': 'snowing', '안개가 끼어 있으며': 'foggy' };
 
-        // ---------------------------------------------------------
-        // LOCAL STORAGE FUNCTIONS (No WiFi needed)
-        // ---------------------------------------------------------
-        const STORAGE_KEY = 'AIR_PREMIA_LAST_INPUT';
+        const airports = [
+            { name: "서울, 인천", offset: 0 }, { name: "로스엔젤레스", offset: -17 },
+            { name: "뉴왁", offset: -14 }, { name: "샌프란시스코", offset: -17 },
+            { name: "워싱턴, 덜레스", offset: -14 }, { name: "도쿄, 나리타", offset: 0 },
+            { name: "방콕, 스완나품", offset: -2 }, { name: "호치민, 탄손넛", offset: -2 },
+            { name: "다낭", offset: -2 }, { name: "홍콩, 첵랍콕", offset: -1 },
+            { name: "프랑크푸르트, 마인", offset: -8 }
+        ];
 
-        function saveLocalData() {
-            const data = {
-                wCaptain: document.getElementById('w-captain').value,
-                wGreeting: document.getElementById('w-greeting').value,
-                wDestSelect: document.getElementById('w-dest-select').value,
-                wDestCustom: document.getElementById('w-dest-custom').value,
-                wHour: document.getElementById('w-hour').value,
-                wMin: document.getElementById('w-min').value,
-                aAirportSelect: document.getElementById('a-airport-select').value,
-                aAirportCustom: document.getElementById('a-airport-custom').value,
-                aMonth: document.getElementById('a-month').value,
-                aDate: document.getElementById('a-date').value,
-                aAmpm: document.getElementById('a-ampm').value,
-                aHour: document.getElementById('a-hour').value,
-                aMin: document.getElementById('a-min').value,
-                aWeather: document.getElementById('a-weather').value,
-                aTemp: document.getElementById('a-temp').value,
-                aCharter: document.getElementById('a-charter').value,
-                cBumpy: document.getElementById('c-bumpy').checked,
-                cTimezone: document.getElementById('c-timezone').checked,
-                cOption: document.getElementById('c-option').checked
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        airports.forEach(ap => {
+            let depOpt = new Option(ap.name, ap.name); depOpt.dataset.offset = ap.offset;
+            elements.dep.add(depOpt);
+        });
+
+        elements.dest.add(new Option("선택하세요", ""));
+        airports.forEach(ap => {
+            let destOpt = new Option(ap.name, ap.name); destOpt.dataset.offset = ap.offset;
+            elements.dest.add(destOpt);
+        });
+
+        elements.h.add(new Option(" ", ""));
+        for(let i=1; i<=16; i++) elements.h.add(new Option(i, i));
+        elements.m.add(new Option(" ", ""));
+        for(let i=0; i<60; i+=5) elements.m.add(new Option(i, i));
+
+        for(let i=-25; i<=45; i++) {
+            let opt = new Option(i, i); if(i === 20) opt.selected = true;
+            elements.temp.add(opt);
         }
 
-        function loadLocalData() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                const data = JSON.parse(saved);
-                document.getElementById('w-captain').value = data.wCaptain || "";
-                document.getElementById('w-greeting').value = data.wGreeting || "Morning";
-                document.getElementById('w-dest-select').value = data.wDestSelect || "";
-                document.getElementById('w-dest-custom').value = data.wDestCustom || "";
-                document.getElementById('w-hour').value = data.wHour || "";
-                document.getElementById('w-min').value = data.wMin || "";
-                document.getElementById('a-airport-select').value = data.aAirportSelect || "";
-                document.getElementById('a-airport-custom').value = data.aAirportCustom || "";
-                document.getElementById('a-month').value = data.aMonth || "";
-                document.getElementById('a-date').value = data.aDate || "";
-                document.getElementById('a-ampm').value = data.aAmpm || "오전";
-                document.getElementById('a-hour').value = data.aHour || "";
-                document.getElementById('a-min').value = data.aMin || "";
-                document.getElementById('a-weather').value = data.aWeather || "맑으며";
-                document.getElementById('a-temp').value = data.aTemp || "";
-                document.getElementById('a-charter').value = data.aCharter || "";
-                document.getElementById('c-bumpy').checked = data.cBumpy || false;
-                document.getElementById('c-timezone').checked = data.cTimezone || false;
-                document.getElementById('c-option').checked = data.cOption || false;
-                
-                toggleWelcomeDest();
-                toggleArrivalAirport();
-                return true;
-            }
-            return false;
-        }
-
-        // ---------------------------------------------------------
-        // CORE UI FUNCTIONS
-        // ---------------------------------------------------------
-        function getSurname(fullName) {
-            if (!fullName) return "";
-            const name = fullName.trim();
-            for (let ds in DOUBLE_SURNAMES) if (name.startsWith(ds)) return DOUBLE_SURNAMES[ds];
-            const firstChar = name.charAt(0);
-            return SURNAME_MAP[firstChar] || firstChar.toUpperCase();
-        }
-
-        window.switchTab = function(type) {
-            document.getElementById('section-welcome').classList.toggle('hidden', type !== 'welcome');
-            document.getElementById('section-arrival').classList.toggle('hidden', type !== 'arrival');
-            document.getElementById('tab-welcome').className = (type === 'welcome') ? 'flex-1 py-4 text-center transition tab-active hover:bg-white/5 font-bold uppercase tracking-tight' : 'flex-1 py-4 text-center transition tab-inactive hover:bg-white/5 font-bold uppercase tracking-tight';
-            document.getElementById('tab-arrival').className = (type === 'arrival') ? 'flex-1 py-4 text-center transition tab-active hover:bg-white/5 font-bold uppercase tracking-tight' : 'flex-1 py-4 text-center transition tab-inactive hover:bg-white/5 font-bold uppercase tracking-tight';
-        }
-
-        window.stepValue = function(id, change) {
-            const input = document.getElementById(id);
-            let val = parseInt(input.value) || 0;
-            if (id === 'a-month') { val += change; if (val > 12) val = 1; if (val < 1) val = 12; }
-            else if (id === 'a-date') { val += change; if (val > 31) val = 1; if (val < 1) val = 31; }
-            else if (id === 'a-hour') { val += change; if (val > 12) val = 1; if (val < 1) val = 12; }
-            else if (id === 'a-min') { val += change; if (val >= 60) val = 0; if (val < 0) val = 59; }
-            input.value = (id === 'a-min') ? val.toString().padStart(2, '0') : val;
-            inputChanged();
-        }
-
-        window.initSystemTime = function() {
-            const now = new Date();
-            const month = now.getMonth() + 1;
-            const date = now.getDate();
-            let hour = now.getHours();
-            const ampm = hour >= 12 ? '오후' : '오전';
-            hour = hour % 12 || 12;
-            const min = now.getMinutes().toString().padStart(2, '0');
-            document.getElementById('a-month').value = month;
-            document.getElementById('a-date').value = date;
-            document.getElementById('a-ampm').value = ampm;
-            document.getElementById('a-hour').value = hour;
-            document.getElementById('a-min').value = min;
-            calculateDay();
-        }
-
-        function calculateDay() {
-            const y = new Date().getFullYear();
-            const m = parseInt(document.getElementById('a-month').value);
-            const d = parseInt(document.getElementById('a-date').value);
-            if (m && d) {
-                const dateObj = new Date(y, m - 1, d);
-                const dayKR = DAYS_KR[dateObj.getDay()];
-                document.getElementById('a-day').value = dayKR || "";
-                return dayKR || "";
-            }
-            return "";
-        }
-
-        window.toggleWelcomeDest = function() {
-            const wSelect = document.getElementById('w-dest-select');
-            const wCustomInput = document.getElementById('w-dest-custom');
-            wCustomInput.classList.toggle('hidden', wSelect.value !== 'custom');
-            const aSelect = document.getElementById('a-airport-select');
-            aSelect.value = wSelect.value;
-            toggleArrivalAirport();
-            updateWelcome();
-        }
-
-        window.toggleArrivalAirport = function() {
-            const aSelect = document.getElementById('a-airport-select');
-            const aCustom = document.getElementById('a-airport-custom');
-            aCustom.classList.toggle('hidden', aSelect.value !== 'custom');
-            updateArrival();
-        }
-
-        window.updateWelcome = function() {
-            const captain = document.getElementById('w-captain').value;
-            const greeting = document.getElementById('w-greeting').value;
-            const destSelect = document.getElementById('w-dest-select').value;
-            const destKo = (destSelect === 'custom') ? (document.getElementById('w-dest-custom').value || '\u00A0') : (destSelect || '\u00A0');
-            const destEn = (destSelect === 'custom') ? destKo : (AIRPORT_MAP[destSelect] || destSelect || '\u00A0');
-            document.getElementById('dv-w-ko-captain').innerText = captain || '\u00A0';
-            document.getElementById('dv-w-en-captain').innerText = getSurname(captain) || '\u00A0';
-            document.getElementById('dv-w-ko-dest').innerText = destKo;
-            document.getElementById('dv-w-en-dest').innerText = destEn;
-            document.getElementById('dv-w-ko-hour').innerText = document.getElementById('w-hour').value || '\u00A0';
-            document.getElementById('dv-w-en-hour').innerText = document.getElementById('w-hour').value || '\u00A0';
-            document.getElementById('dv-w-ko-min').innerText = document.getElementById('w-min').value || '\u00A0';
-            document.getElementById('dv-w-en-min').innerText = document.getElementById('w-min').value || '\u00A0';
-            document.getElementById('dv-w-en-greeting').innerText = greeting;
-            if (destSelect === 'custom') document.getElementById('a-airport-custom').value = document.getElementById('w-dest-custom').value;
-            updateArrival();
-        }
-
-        window.updateArrival = function() {
-            const dayKo = calculateDay();
-            const airportSelect = document.getElementById('a-airport-select').value;
-            const airportKo = (airportSelect === 'custom') ? (document.getElementById('a-airport-custom').value || '\u00A0') : (airportSelect || '\u00A0');
-            const airportEn = (airportSelect === 'custom') ? airportKo : (AIRPORT_MAP[airportSelect] || '\u00A0');
-            const month = document.getElementById('a-month').value || '\u00A0';
-            const weatherKo = document.getElementById('a-weather').value;
-            const tempC = document.getElementById('a-temp').value || '\u00A0';
-            const isBumpy = document.getElementById('c-bumpy').checked;
-            document.querySelectorAll('.dv-a-airport').forEach(el => el.innerText = airportKo);
-            document.querySelectorAll('.dv-a-en-airport').forEach(el => el.innerText = airportEn);
-            document.querySelectorAll('.dv-a-month').forEach(el => el.innerText = month);
-            document.querySelectorAll('.dv-a-en-month').forEach(el => el.innerText = MONTHS[parseInt(month)] || month);
-            document.querySelectorAll('.dv-a-date').forEach(el => el.innerText = document.getElementById('a-date').value || '\u00A0');
-            document.querySelectorAll('.dv-a-day').forEach(el => el.innerText = dayKo);
-            document.querySelectorAll('.dv-a-en-day').forEach(el => el.innerText = DAYS_EN[dayKo] || dayKo);
-            document.querySelectorAll('.dv-a-ampm').forEach(el => el.innerText = document.getElementById('a-ampm').value);
-            document.querySelectorAll('.dv-a-en-ampm').forEach(el => el.innerText = document.getElementById('a-ampm').value === '오전' ? 'am' : 'pm');
-            document.querySelectorAll('.dv-a-hour').forEach(el => el.innerText = document.getElementById('a-hour').value || '\u00A0');
-            document.querySelectorAll('.dv-a-min').forEach(el => el.innerText = document.getElementById('a-min').value || '\u00A0');
-            document.querySelectorAll('.dv-a-weather').forEach(el => el.innerText = weatherKo);
-            document.querySelectorAll('.dv-a-en-weather').forEach(el => el.innerText = WEATHER[weatherKo] || weatherKo);
-            document.querySelectorAll('.dv-a-temp').forEach(el => el.innerText = tempC);
-            document.querySelectorAll('.dv-a-temp-f').forEach(el => el.innerText = tempC !== '\u00A0' ? Math.round((tempC * 9/5) + 32) : '\u00A0');
-            document.querySelectorAll('.dv-a-charter').forEach(el => el.innerText = document.getElementById('a-charter').value || '\u00A0');
-            document.getElementById('ko-bumpy-txt').classList.toggle('hidden', !isBumpy);
-            document.getElementById('en-bumpy-txt').classList.toggle('hidden', !isBumpy);
-            document.getElementById('ko-enjoy').classList.toggle('hidden', isBumpy);
-            document.getElementById('en-enjoy').classList.toggle('hidden', isBumpy);
-            document.getElementById('ko-timezone-box').classList.toggle('hidden', !document.getElementById('c-timezone').checked);
-            document.getElementById('en-timezone-box').classList.toggle('hidden', !document.getElementById('c-timezone').checked);
-            document.getElementById('ko-option-box').classList.toggle('hidden', !document.getElementById('c-option').checked);
-            document.getElementById('en-option-box').classList.toggle('hidden', !document.getElementById('c-option').checked);
-        }
-
-        window.inputChanged = function() {
-            window.updateWelcome();
-            window.updateArrival();
-            saveLocalData();
-        }
-
-        window.resetAllData = function() {
-            localStorage.removeItem(STORAGE_KEY);
-            document.getElementById('w-captain').value = '';
-            document.getElementById('w-greeting').value = 'Morning'; 
-            document.getElementById('w-dest-select').value = '';
-            document.getElementById('w-dest-custom').value = '';
-            document.getElementById('w-hour').value = '';
-            document.getElementById('w-min').value = '';
-            document.getElementById('a-airport-select').value = '';
-            document.getElementById('a-airport-custom').value = '';
-            document.getElementById('a-weather').value = '맑으며';
-            document.getElementById('a-temp').value = '';
-            document.getElementById('a-charter').value = '';
-            document.getElementById('c-bumpy').checked = false;
-            document.getElementById('c-timezone').checked = false;
-            document.getElementById('c-option').checked = false;
+        function updateAll() {
+            const destName = elements.dest.value || "목적지";
+            const hVal = elements.h.value;
+            const mVal = elements.m.value;
+            const weatherKo = elements.weather.value;
+            const tempC = parseInt(elements.temp.value);
+            const depOffset = parseInt(elements.dep.options[elements.dep.selectedIndex].dataset.offset || 0);
+            const destOffset = parseInt(elements.dest.options[elements.dest.selectedIndex]?.dataset.offset || 0);
             
-            initSystemTime();
-            toggleWelcomeDest();
-            toggleArrivalAirport();
-            updateWelcome();
-            updateArrival();
+            // DST 보정: 체크 시 1시간 추가
+            const dstAdjustment = elements.dst.checked ? 1 : 0;
 
-            const toast = document.getElementById("toast");
-            toast.innerText = "모든 데이터가 초기화되었습니다.";
-            toast.style.opacity = "1";
-            setTimeout(() => {
-                toast.style.opacity = "0";
-                setTimeout(() => { toast.innerText = "방송문이 클립보드에 복사되었습니다."; }, 300);
-            }, 2000);
-        }
+            document.getElementById('korNameSpan').innerText = elements.nameKor.value;
+            document.getElementById('engNameSpan').innerText = elements.nameEng.value.toUpperCase();
 
-        window.copyText = function(id) {
-            const range = document.createRange();
-            range.selectNode(document.getElementById(id));
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            document.execCommand('copy');
-            window.getSelection().removeAllRanges();
-            const toast = document.getElementById("toast");
-            toast.style.opacity = "1";
-            setTimeout(() => toast.style.opacity = "0", 2000);
-        }
+            const sysHour = new Date().getHours();
+            let greeting = "Good Evening";
+            if (sysHour >= 5 && sysHour < 12) greeting = "Good Morning";
+            else if (sysHour >= 12 && sysHour < 18) greeting = "Good Afternoon";
+            document.getElementById('engGreetingWelcome').innerText = greeting;
 
-        window.onload = () => { 
-            if (!loadLocalData()) {
-                initSystemTime();
-                updateWelcome();
-                updateArrival();
+            document.querySelectorAll('.dest-text').forEach(el => el.innerText = destName);
+
+            if (hVal === "" && mVal === "") {
+                document.getElementById('korTimeDuration').innerText = "시간 미설정";
+                document.getElementById('engTimeDuration').innerText = "__ hours";
+            } else {
+                const h = parseInt(hVal || 0);
+                const m = parseInt(mVal || 0);
+                document.getElementById('korTimeDuration').innerText = m > 0 ? `${h}시간 ${m}분` : `${h}시간`;
+                document.getElementById('engTimeDuration').innerText = m > 0 ? `${h} hours and ${m} mins` : `${h} hours`;
             }
-        };
+
+            document.querySelectorAll('.weather-text').forEach(el => el.innerText = weatherKo);
+            const weatherMapEn = { "맑으며": "clear", "흐리며": "cloudy", "비가 오고 있으며": "rainy", "눈이 오고 있으며": "snowy", "안개가 끼어 있으며": "foggy" };
+            document.querySelectorAll('.weather-en-text').forEach(el => el.innerText = weatherMapEn[weatherKo]);
+            document.querySelectorAll('.temp-text').forEach(el => el.innerText = tempC);
+            document.getElementById('tempF').innerText = Math.round(tempC * 1.8 + 32);
+
+            if(elements.shake.checked) {
+                document.getElementById('korGreeting').innerText = "오늘 기류 영향으로 비행기가 많이 흔들렸습니다. 이점 널리 양해 바랍니다.";
+                document.getElementById('engGreetingArrival').innerText = "The ride was quite bumpy today, we ask for your understanding.";
+            } else {
+                document.getElementById('korGreeting').innerText = "편안한 비행되셨습니까?";
+                document.getElementById('engGreetingArrival').innerText = "We hope you have enjoyed the flight.";
+            }
+
+            // 도착지 현지 시간 계산 (DST 반영)
+            if (depOffset === destOffset || elements.dest.value === "") {
+                document.getElementById('korTimeSpan').classList.add('hidden');
+                document.getElementById('engTimeSpan').classList.add('hidden');
+            } else {
+                document.getElementById('korTimeSpan').classList.remove('hidden');
+                document.getElementById('engTimeSpan').classList.remove('hidden');
+                const now = new Date();
+                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                // 기존 로직(UTC+9+Offset)에 dstAdjustment를 더함
+                const localTime = new Date(utc + (3600000 * (9 + destOffset + dstAdjustment)));
+                document.getElementById('currentTimeKor').innerText = `${localTime.getHours() >= 12 ? "오후" : "오전"} ${localTime.getHours() % 12 || 12}시 ${localTime.getMinutes().toString().padStart(2, '0')}분`;
+                document.getElementById('currentTimeEn').innerText = localTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+            }
+            saveSettings();
+        }
+
+        function setTab(id) {
+            document.querySelectorAll('.content-area, .tab-btn, .tab-inner-controls').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('btn-' + id).classList.add('active');
+            document.getElementById('set-' + id + '-inner').classList.add('active');
+            updateAll();
+        }
+
+        function saveSettings() {
+            const settings = { darkMode: document.body.classList.contains('dark-mode') };
+            for(let key in elements) settings[key] = (key === 'shake' || key === 'dst') ? elements[key].checked : elements[key].value;
+            localStorage.setItem('ap_settings_v22', JSON.stringify(settings));
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('ap_settings_v22');
+            if(saved) {
+                const s = JSON.parse(saved);
+                for(let key in elements) {
+                    if(s[key] !== undefined) {
+                        if(key === 'shake' || key === 'dst') elements[key].checked = s[key];
+                        else elements[key].value = s[key];
+                    }
+                }
+                if(s.darkMode) document.body.classList.add('dark-mode');
+            }
+            updateAll();
+        }
+
+        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); saveSettings(); }
+
+        function resetSettings() {
+            elements.dep.value = "서울, 인천";
+            elements.dest.value = "";
+            elements.h.value = ""; 
+            elements.m.value = ""; 
+            elements.temp.value = 20;
+            elements.weather.value = "맑으며";
+            elements.shake.checked = false;
+            elements.dst.checked = false; // DST 초기화
+            updateAll();
+        }
+
+        for(let key in elements) elements[key].addEventListener('change', updateAll);
+        window.onload = loadSettings;
+        setInterval(updateAll, 60000);
     </script>
 
   <!-- 서비스 워커 등록 -->
