@@ -200,15 +200,15 @@
         </div>
     </div>
 
-    <div id="arrival" class="content-area">
+<div id="arrival" class="content-area">
         <div class="pane">
             <div class="script">
                 손님 여러분, 저는 기장입니다. <br>
                 <span id="korGreeting">편안한 비행되셨습니까?</span> <br>
-                우리는 앞으로 약 40분 후에 목적지 <span class="highlight dest-text">목적지</span>공항에 착륙할 예정입니다.<span id="korTimeSpan"><br>지금 이곳은 <span class="highlight" id="currentTimeKor">오후 12시 00분</span>입니다.</span> <br>
+                우리는 앞으로 약 40분 후에 목적지 <span class="highlight dest-text">목적지</span>공항에 착륙할 예정입니다.<span id="korTimeSpan"><br>지금 이곳은 <span class="highlight" id="currentDateKor">1월 1일 월요일</span> <span class="highlight" id="currentTimeKor">오후 12시 00분</span>입니다.</span> <br>
                 <span class="highlight dest-text">목적지</span>공항의 날씨는 <span class="highlight weather-text">맑으며</span>, 기온은 섭씨 <span class="highlight temp-text">20</span>도 입니다. <br>
                 소중한 여행을 저희 에어프레미아와 함께 해 주셔서 감사드립니다. <br>
-                가시는 목적지까지 안전하고 즐거운 여행이 되시기 바랍니다. <br>
+                아무쪼록 가시는 목적지까지 안전하고 즐거운 여행이 되시기 바랍니다. <br>
                 고맙습니다.
             </div>
         </div>
@@ -216,10 +216,10 @@
             <div class="script script-en">
                 Ladies and Gentlemen, This is captain speaking. <br>
                 <span id="engGreetingArrival">We hope you have enjoyed the flight.</span> <br>
-                We are about 40 minutes away from <span class="highlight dest-text">Destination</span> airport. <span id="engTimeSpan"><br>Local Time is <span class="highlight" id="currentTimeEn">12:00 PM</span>.</span> <br>
-                The temperature is <span class="highlight temp-text">20</span><span class="highlight">℃</span>, or <span class="highlight" id="tempF">68</span><span class="highlight">℉</span>. <br>
-                and, it's <span class="highlight weather-en-text">clear</span>. <br>
-                Once again, Thank you for being with Air Premia, <br>
+                We are about 40 minutes away from <span class="highlight dest-text">Destination</span> airport. <span id="engTimeSpan"><br>Local Time now is <span class="highlight" id="currentTimeEn">12:00 PM</span> <span class="highlight" id="currentDateEn">on Monday, January 1</span>.</span> <br>
+                At the airport, it's <span class="highlight weather-en-text">clear</span>. <br>
+                And the temperature is <span class="highlight temp-text">20</span><span class="highlight">℃</span>, or <span class="highlight" id="tempF">68</span><span class="highlight">℉</span>. <br>
+                Once again, Thank you for flying Air Premia<br>
                 and we hope to see you again on your next trip.
             </div>
         </div>
@@ -323,12 +323,23 @@
             } else {
                 document.getElementById('korTimeSpan').classList.remove('hidden');
                 document.getElementById('engTimeSpan').classList.remove('hidden');
+                
                 const now = new Date();
                 const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                // 기존 로직(UTC+9+Offset)에 dstAdjustment를 더함
                 const localTime = new Date(utc + (3600000 * (9 + destOffset + dstAdjustment)));
+                
+                // 시간 표시
                 document.getElementById('currentTimeKor').innerText = `${localTime.getHours() >= 12 ? "오후" : "오전"} ${localTime.getHours() % 12 || 12}시 ${localTime.getMinutes().toString().padStart(2, '0')}분`;
                 document.getElementById('currentTimeEn').innerText = localTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+                // 날짜 표시 (한글: 월 일 요일)
+                const daysKor = ["일", "월", "화", "수", "목", "금", "토"];
+                document.getElementById('currentDateKor').innerText = `${localTime.getMonth() + 1}월 ${localTime.getDate()}일 ${daysKor[localTime.getDay()]}요일`;
+
+                // 날짜 표시 (영문: on day, month, date)
+                const daysEn = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                const monthsEn = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                document.getElementById('currentDateEn').innerText = `on ${daysEn[localTime.getDay()]}, ${monthsEn[localTime.getMonth()]} ${localTime.getDate()}`;
             }
             saveSettings();
         }
